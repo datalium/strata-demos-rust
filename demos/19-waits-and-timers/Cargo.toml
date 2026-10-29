@@ -1,0 +1,14 @@
+[package]
+name = "waits-and-timers"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4"
+datalium-strata = { workspace = true }
+datalium-strata-memory = { workspace = true }
+# For reading the file with no Strata code. Already in the engine's own tree
+# (strata-memory's SQLite store uses it), so it adds no new crate.
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

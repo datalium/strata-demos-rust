@@ -1,0 +1,9 @@
+{
+  "runs": {
+    "lease": { "owner": "reminders-1", "ttl": "30s" }
+  },
+  "wake": {
+    "interval": "5s",
+    "batch_size": 10
+  }
+}

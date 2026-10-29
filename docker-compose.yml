@@ -1,0 +1,38 @@
+# Throwaway Postgres + Redis for demo 12-pluggable-storage. Not a deployment
+# recipe: the credentials are public and nothing is persisted between runs.
+#
+#   docker compose up -d --wait
+#   cargo run -p pluggable-storage
+#   docker compose down
+#
+# The demo reads STRATA_DEMO_POSTGRES_URL / STRATA_DEMO_REDIS_URL and defaults
+# to the addresses below. datalium/strata and strata-demos-dotnet ship the same file
+# (same ports), so run only one copy at a time.
+services:
+    postgres:
+        image: postgres:16-alpine
+        environment:
+            POSTGRES_USER: strata
+            POSTGRES_PASSWORD: strata
+            POSTGRES_DB: strata
+        ports:
+            - '5432:5432'
+        tmpfs:
+            - /var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U strata -d strata']
+            interval: 2s
+            timeout: 3s
+            retries: 30
+
+    redis:
+        image: redis:7-alpine
+        # No persistence: a fresh, empty Redis every `up`.
+        command: ['redis-server', '--save', '', '--appendonly', 'no']
+        ports:
+            - '6379:6379'
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 2s
+            timeout: 3s
+            retries: 30

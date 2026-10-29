@@ -1,0 +1,15 @@
+[package]
+name = "run-observability"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+datalium-strata = { workspace = true }
+datalium-strata-memory = { workspace = true }
+# The capture side, as Strata's own telemetry tests use them: a tracing
+# subscriber to collect the engine's spans and a debugging metrics recorder.
+metrics-util = { version = "0.20", default-features = false, features = ["debugging"] }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time", "sync"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["registry", "std"] }

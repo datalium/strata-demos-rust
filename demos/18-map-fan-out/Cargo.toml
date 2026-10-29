@@ -1,0 +1,10 @@
+[package]
+name = "map-fan-out"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+datalium-strata = { workspace = true }
+datalium-strata-memory = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time", "sync"] }

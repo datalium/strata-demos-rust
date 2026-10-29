@@ -1,0 +1,11 @@
+[package]
+name = "durable-execution"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4"
+datalium-strata = { workspace = true }
+datalium-strata-memory = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

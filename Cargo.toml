@@ -1,0 +1,41 @@
+[workspace]
+resolver = "3"
+
+members = [
+    "demos/01-hello-agent",
+    "demos/02-tool-calling",
+    "demos/03-llm-tool-calling",
+    "demos/04-multi-node-graph",
+    "demos/05-hitl-interruption",
+    "demos/06-token-streaming",
+    "demos/07-graph-validation",
+    "demos/08-error-recovery",
+    "demos/09-cross-language-interop",
+    "demos/10-parallel-fan-out",
+    "demos/11-backpressure",
+    "demos/12-pluggable-storage",
+    "demos/13-subgraph-composition",
+    "demos/14-graph-ci-gate",
+    "demos/15-async-and-cancellation",
+    "demos/16-loop-circuit-breaker",
+    "demos/17-parallel-joins",
+    "demos/18-map-fan-out",
+    "demos/19-waits-and-timers",
+    "demos/20-durable-execution",
+    "demos/21-thread-leases",
+    "demos/22-graph-identity",
+    "demos/23-agent-tool-loop",
+    "demos/24-model-routes",
+    "demos/25-long-term-memory",
+    "demos/26-tool-registry-and-middleware",
+    "demos/27-run-observability",
+    "demos/28-hosting",
+    "demos/29-run-scheduler",
+]
+
+[workspace.dependencies]
+datalium-strata = "=0.9.0-preview.1"
+datalium-strata-macros = "=0.9.0-preview.1"
+datalium-strata-memory = "=0.9.0-preview.1"
+datalium-strata-ai = "=0.9.0-preview.1"
+datalium-strata-host = "=0.9.0-preview.1"

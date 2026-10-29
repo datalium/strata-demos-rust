@@ -1,0 +1,11 @@
+[package]
+name = "parallel-fan-out"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+datalium-strata = { workspace = true }
+datalium-strata-memory = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+# `test-util` is for `start_paused = true`: the demo runs on a paused tokio clock.
+tokio = { version = "1", features = ["macros", "rt", "time", "test-util"] }

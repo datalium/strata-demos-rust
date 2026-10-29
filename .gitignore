@@ -13,8 +13,11 @@ target
 # Contains mutation testing data
 **/mutants.out*/
 
-# rustc will dump stack traces when hitting an internal compiler error to PWD
-rustc-ice-*.txt
+# SQLite checkpoint file written/removed at runtime by the
+# 05-hitl-interruption demo (SqliteCheckpointStore against a real file,
+# deleted at the start and end of `main()` -- this is a backstop in case a
+# run is interrupted before its own cleanup).
+demos/05-hitl-interruption/*.sqlite
 
 # RustRover
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
@@ -22,3 +25,17 @@ rustc-ice-*.txt
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# SQLite checkpoint file written/removed at runtime by the
+# 08-error-recovery demo (same pattern and same backstop as 05).
+demos/08-error-recovery/*.sqlite
+
+# SQLite files demos write at runtime (checkpoint stores, memory stores), in
+# case a run stops before its own cleanup.
+demos/*/*.sqlite
+demos/*/*.sqlite-*
+demos/*/*.db
+demos/*/*.db-*
+
+# rustc will dump stack traces when hitting an internal compiler error to PWD
+rustc-ice-*.txt

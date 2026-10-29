@@ -1,0 +1,12 @@
+[package]
+name = "model-routes"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+datalium-strata = { workspace = true }
+datalium-strata-ai = { workspace = true }
+datalium-strata-memory = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+# test-util: the demo runs on a paused tokio clock (`start_paused`).
+tokio = { version = "1", features = ["macros", "rt", "time", "sync", "test-util"] }

@@ -1,0 +1,12 @@
+[package]
+name = "parallel-joins"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+datalium-strata = { workspace = true }
+datalium-strata-memory = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+# test-util: the demo runs on tokio's paused clock (`start_paused`), so
+# scenario 7's 30 s and 45 s cost no real time.
+tokio = { version = "1", features = ["macros", "rt", "time", "sync", "test-util"] }

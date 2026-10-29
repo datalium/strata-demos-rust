@@ -1,0 +1,11 @@
+[package]
+name = "run-scheduler"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+datalium-strata = { workspace = true }
+datalium-strata-memory = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+# test-util: `start_paused`, a tokio clock that moves only when the demo advances it.
+tokio = { version = "1", features = ["macros", "rt", "time", "sync", "test-util"] }
