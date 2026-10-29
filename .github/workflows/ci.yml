@@ -93,7 +93,8 @@ jobs:
 
       - name: Run the demos
         run: |
-          set -uo pipefail
+          # No -e: run every demo, then report all the failures.
+          set +e -uo pipefail
           failed=()
           run() {
             local pkg
