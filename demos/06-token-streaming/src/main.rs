@@ -13,6 +13,9 @@
 //! Requires `OPENAI_API_KEY` in the environment. Costs a small amount of
 //! real OpenAI usage each run (the second run is refused before any tokens
 //! are generated).
+//! Or run it free against a local model: set `OPENAI_BASE_URL` to any
+//! OpenAI-compatible server (Ollama, vLLM, LM Studio) and `OPENAI_MODEL` to a
+//! model it serves.
 
 use std::env;
 use std::io::Write;
@@ -54,23 +57,16 @@ impl LlmStreamState {
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    let Some(api_key) = env::var("OPENAI_API_KEY")
-        .ok()
-        .filter(|key| !key.is_empty())
-    else {
-        eprintln!(
-            "OPENAI_API_KEY is not set. Get a key at https://platform.openai.com/api-keys \
-             and export it, e.g.:\n\n    export OPENAI_API_KEY=sk-...\n"
-        );
-        return ExitCode::FAILURE;
+    let options = match provider_options() {
+        Ok(options) => options,
+        Err(message) => {
+            eprintln!("{message}");
+            return ExitCode::FAILURE;
+        }
     };
-    let model = env::var("OPENAI_MODEL")
-        .ok()
-        .filter(|model| !model.is_empty())
-        .unwrap_or_else(|| DEFAULT_MODEL.to_string());
 
-    let chat = openai_client(&api_key, &model);
-    let missing = openai_client(&api_key, MISSING_MODEL);
+    let chat = openai_client(options.clone());
+    let missing = openai_client(options.with_model(MISSING_MODEL));
 
     // --- 1. A live answer, streamed -----------------------------------------
 
@@ -232,10 +228,8 @@ fn build_graph(client: Arc<dyn ChatClient>) -> Arc<CompiledGraph<LlmStreamState>
 
 /// The client does no retrying of its own (design/44): the node's
 /// RecoveryPolicy does, and it sees the provider's retry hint.
-fn openai_client(api_key: &str, model: &str) -> Arc<dyn ChatClient> {
-    Arc::new(OpenAiChatClient::new(
-        OpenAiOptions::new(api_key).with_model(model),
-    ))
+fn openai_client(options: OpenAiOptions) -> Arc<dyn ChatClient> {
+    Arc::new(OpenAiChatClient::new(options))
 }
 
 fn store() -> Arc<dyn CheckpointStore> {
@@ -260,5 +254,34 @@ fn check(ok: bool, what: &str) {
     if !ok {
         eprintln!("check failed: {what}");
         std::process::exit(1);
+    }
+}
+
+/// OpenAI by default. `OPENAI_BASE_URL` points the same client at any
+/// OpenAI-compatible server instead (e.g. Ollama at
+/// `http://localhost:11434/v1`), where the key is optional.
+fn provider_options() -> Result<OpenAiOptions, String> {
+    let var = |name: &str| env::var(name).ok().filter(|value| !value.is_empty());
+    let model = var("OPENAI_MODEL");
+    match (var("OPENAI_BASE_URL"), var("OPENAI_API_KEY")) {
+        (Some(base_url), api_key) => {
+            let model = model.ok_or(
+                "OPENAI_BASE_URL is set, so set OPENAI_MODEL too: a model your server has, e.g. qwen2.5:3b.",
+            )?;
+            let options = OpenAiOptions::compatible(base_url).with_model(model);
+            Ok(match api_key {
+                Some(api_key) => options.with_api_key(api_key),
+                None => options,
+            })
+        }
+        (None, Some(api_key)) => Ok(OpenAiOptions::new(api_key)
+            .with_model(model.unwrap_or_else(|| DEFAULT_MODEL.to_string()))),
+        (None, None) => Err(
+            "OPENAI_API_KEY is not set. Get a key at https://platform.openai.com/api-keys \
+             and export it, e.g.:\n\n    export OPENAI_API_KEY=sk-...\n\n\
+             Or use a local model, e.g. with Ollama:\n\n    \
+             export OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5:3b\n"
+                .to_string(),
+        ),
     }
 }

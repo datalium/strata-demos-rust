@@ -1,9 +1,27 @@
-# Runs the two demos that call a live OpenAI model (03 and 06).
-# Manual only: each run makes real, billed API calls.
+# Runs the two demos that call a live model (03 and 06).
+#
+# By default the model is a local one: Ollama runs as a service container on the runner, so a run
+# costs nothing and needs no key. Choose "openai" when starting it by hand to call OpenAI instead,
+# with the OPENAI_API_KEY secret (only people with write access can start a run, and pull requests
+# from forks never get secrets).
 name: Live-model demos
 
 on:
   workflow_dispatch:
+    inputs:
+      provider:
+        description: Where the model runs
+        type: choice
+        options: [ollama, openai]
+        default: ollama
+      model:
+        description: Model name (empty = qwen2.5:3b on Ollama, gpt-4o-mini on OpenAI)
+        required: false
+  pull_request:
+    paths:
+      - 'demos/03-llm-tool-calling/**'
+      - 'demos/06-token-streaming/**'
+      - '.github/workflows/live-model-demos.yml'
 
 permissions:
   contents: read
@@ -11,24 +29,44 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      PROVIDER: ${{ inputs.provider || 'ollama' }}
+      MODEL: ${{ inputs.model }}
+      # The key reaches the job only when OpenAI was chosen.
+      OPENAI_API_KEY: ${{ inputs.provider == 'openai' && secrets.OPENAI_API_KEY || '' }}
       CARGO_TERM_COLOR: always
+
+    services:
+      ollama:
+        image: ollama/ollama:0.40.4
+        ports: ['11434:11434']
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
 
-      - name: Check the API key is available
-        run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "::error::OPENAI_API_KEY is not available to this repository."
-            exit 1
-          fi
-
       - name: Build
         run: cargo build --package llm-tool-calling --package token-streaming
+
+      - name: Choose the model
+        run: |
+          if [ "$PROVIDER" = ollama ]; then
+            model="${MODEL:-qwen2.5:3b}"
+            for i in $(seq 30); do curl -fs http://localhost:11434/api/version > /dev/null && break; sleep 2; done
+            echo "Pulling $model into Ollama..."
+            curl -fsS http://localhost:11434/api/pull -d "{\"model\":\"$model\",\"stream\":false}"
+            echo
+            echo "OPENAI_BASE_URL=http://localhost:11434/v1" >> "$GITHUB_ENV"
+            echo "OPENAI_MODEL=$model" >> "$GITHUB_ENV"
+          else
+            if [ -z "$OPENAI_API_KEY" ]; then
+              echo "::error::OPENAI_API_KEY is not available to this repository."
+              exit 1
+            fi
+            if [ -n "$MODEL" ]; then echo "OPENAI_MODEL=$MODEL" >> "$GITHUB_ENV"; fi
+          fi
 
       - name: 03 llm-tool-calling
         run: cargo run --package llm-tool-calling
