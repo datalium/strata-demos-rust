@@ -7,7 +7,7 @@ Thanks for helping. These are runnable examples for [Datalium Strata](https://gi
 - **Rust** 1.85 or later, with `rustfmt` and `clippy` (`rustup component add rustfmt clippy`).
 - **Docker**, only for demo 12 (`docker compose up -d --wait` starts Postgres and Redis).
 - The **`strata` CLI**, only for demo 14 (see the [README](README.md#prerequisites)).
-- An **`OPENAI_API_KEY`**, only for demos 03 and 06. They make real, billed calls.
+- An **`OPENAI_API_KEY`**, only for demos 03 and 06, which make real, billed calls. Or a free local model: Ollama with `OPENAI_BASE_URL` and `OPENAI_MODEL` (see their READMEs).
 
 ## Build and run
 

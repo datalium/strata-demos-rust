@@ -11,7 +11,7 @@ answer. The demo has no OpenAI request or response code of its own, and no
 HTTP client of its own either: `reqwest` reaches it only through
 `datalium-strata-ai`.
 
-This demo makes real, billed calls to the OpenAI API. It and
+By default this demo makes real, billed calls to the OpenAI API. [With a local model](#with-a-local-model) it costs nothing. It and
 [`06-token-streaming`](../06-token-streaming) are the only demos that do (see
 the "Note on LLMs" in the root [README](../../README.md)). Everything else
 stays offline. Its .NET twin is
@@ -106,13 +106,35 @@ profile, or set it as a permanent user/system environment variable
 (`setx OPENAI_API_KEY "sk-..."` on Windows, which takes effect in new
 terminals only).
 
+### With a local model
+
+Any OpenAI-compatible server works instead of OpenAI: Ollama, vLLM, LM Studio and others. A run then costs nothing. Set `OPENAI_BASE_URL` to the server's address, up to `/v1`, and `OPENAI_MODEL` to a model it serves. A key is optional: `OPENAI_API_KEY` is sent if it's set. With [Ollama](https://ollama.com):
+
+```bash
+ollama pull qwen2.5:3b
+export OPENAI_BASE_URL=http://localhost:11434/v1
+export OPENAI_MODEL=qwen2.5:3b
+```
+
+The model must support tool calls. A model that answers without calling `add` fails the demo's check, which says so. `qwen2.5:3b` does, as the run below shows.
+
+The repo's **Live-model demos** workflow runs this demo the same way, against Ollama on the GitHub runner. This is its run on 2026-10-29 (`qwen2.5:3b`, Ollama 0.40.4). The wording varies from run to run:
+
+```
+[add] 47 + 89, called by agent 'calculator' (model call id call_93r44eic) in node 'AskLlm'
+tool call: add {"a":47,"b":89} -> {"result":136} (Succeeded)
+tool result: 136
+model turns: 2
+model: The sum of 47 and 89 is 136.
+```
+
 ## Run it
 
 ```bash
 cargo run -p llm-tool-calling
 ```
 
-Without `OPENAI_API_KEY` set, the demo prints a short setup message to
+Without `OPENAI_API_KEY` or `OPENAI_BASE_URL` set, the demo prints a short setup message to
 stderr and exits with code 1, before making any network call. This is a
 real run, without a key:
 
@@ -120,6 +142,10 @@ real run, without a key:
 OPENAI_API_KEY is not set. Get a key at https://platform.openai.com/api-keys and export it, e.g.:
 
     export OPENAI_API_KEY=sk-...
+
+Or use a local model, e.g. with Ollama:
+
+    export OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5:3b
 
 ```
 

@@ -43,7 +43,7 @@ crates.io: it is a binary on the `datalium/strata` GitHub Release.
   run offline with no API keys, unless the user explicitly asks to wire in a
   real provider — see [`03-llm-tool-calling`](demos/03-llm-tool-calling) and
   [`06-token-streaming`](demos/06-token-streaming), the two demos that do
-  (`datalium-strata-ai`'s `OpenAiChatClient`, gated on `OPENAI_API_KEY`). Keep that pattern contained to demos that exist
+  (`datalium-strata-ai`'s `OpenAiChatClient`, gated on `OPENAI_API_KEY`, or `OPENAI_BASE_URL` for a local OpenAI-compatible server). Keep that pattern contained to demos that exist
   specifically to show it off; don't let it creep into otherwise-offline
   demos.
 - **Each demo gets its own `README.md`** (see `demos/01-hello-agent/README.md`

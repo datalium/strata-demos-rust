@@ -11,7 +11,7 @@ for a model that doesn't exist, to show a provider fault failing the node.
 Pairs with [`03-llm-tool-calling`](../03-llm-tool-calling): the same OpenAI
 client, a model node instead of an agent.
 
-This demo makes real, billed calls to the OpenAI API. It and demo 03 are
+By default this demo makes real, billed calls to the OpenAI API. [With a local model](#with-a-local-model) it costs nothing. It and demo 03 are
 the only demos that do. Its .NET twin is
 [`strata-demos-dotnet/demos/06-token-streaming`](https://github.com/datalium/strata-demos-dotnet/tree/main/demos/06-token-streaming).
 
@@ -94,13 +94,45 @@ On Windows PowerShell: `$env:OPENAI_API_KEY = "sk-..."`. See
 [demo 03's README](../03-llm-tool-calling/README.md#setup) for making it
 persist.
 
+### With a local model
+
+Any OpenAI-compatible server works instead of OpenAI: Ollama, vLLM, LM Studio and others. A run then costs nothing. Set `OPENAI_BASE_URL` to the server's address, up to `/v1`, and `OPENAI_MODEL` to a model it serves. A key is optional: `OPENAI_API_KEY` is sent if it's set. With [Ollama](https://ollama.com):
+
+```bash
+ollama pull qwen2.5:3b
+export OPENAI_BASE_URL=http://localhost:11434/v1
+export OPENAI_MODEL=qwen2.5:3b
+```
+
+The repo's **Live-model demos** workflow runs this demo the same way, against Ollama on the GitHub runner. This is its run on 2026-10-29 (`qwen2.5:3b`, Ollama 0.40.4). The wording varies from run to run:
+
+```
+=== Streaming a live answer, one token at a time ===
+
+[node start] AnswerQuestion
+Rust's borrow checker differs from garbage collection in that it operates statically at compile time, enforcing memory safety through logic rather than runtime checks. Garbage collection, on the other hand, is typically a runtime mechanism used to manage memory automatically by periodically identifying and reclaiming memory that is no longer in use.
+[node end]   AnswerQuestion
+[node start] SummarizeAnswer
+[node end]   SummarizeAnswer
+
+=== Done ===
+token_chunks: 61
+answer_char_count: 351
+
+=== A provider fault: asking for model 'strata-demo-no-such-model' ===
+
+node failed: AnswerQuestion, after 1 attempt(s)
+message: model call failed (404): 404 Not Found: model 'strata-demo-no-such-model' not found
+chunks the consumer saw: NodeStart, Error
+```
+
 ## Run it
 
 ```bash
 cargo run -p token-streaming
 ```
 
-Without `OPENAI_API_KEY` set, the demo prints a short setup message to
+Without `OPENAI_API_KEY` or `OPENAI_BASE_URL` set, the demo prints a short setup message to
 stderr and exits with code 1, before making any network call. This is a
 real run, without a key:
 
@@ -108,6 +140,10 @@ real run, without a key:
 OPENAI_API_KEY is not set. Get a key at https://platform.openai.com/api-keys and export it, e.g.:
 
     export OPENAI_API_KEY=sk-...
+
+Or use a local model, e.g. with Ollama:
+
+    export OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_MODEL=qwen2.5:3b
 
 ```
 
