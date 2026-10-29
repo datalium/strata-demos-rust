@@ -1,0 +1,119 @@
+# Formats, lints and builds every demo and runs every one that works offline
+# (all but 03 and 06, which call a live model: see live-model-demos.yml).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The strata CLI release demo 14 uses. Keep it in step with the crate versions in Cargo.toml.
+  STRATA_CLI_TAG: v0.9.0-preview.1
+  CARGO_TERM_COLOR: always
+
+jobs:
+  demos:
+    name: Rust demos
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    # Postgres and Redis for demo 12, matching docker-compose.yml.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: strata
+          POSTGRES_PASSWORD: strata
+          POSTGRES_DB: strata
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U strata -d strata"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Lint
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+      - name: Get the strata CLI (demo 14)
+        run: |
+          # While datalium/strata is private its release can't be downloaded here, so demo 14 is skipped.
+          status=$(curl -s -o /dev/null -w '%{http_code}' https://api.github.com/repos/datalium/strata)
+          if [ "$status" != 200 ]; then
+            echo "::warning::datalium/strata isn't public yet, so demo 14 is skipped."
+            exit 0
+          fi
+          base="https://github.com/datalium/strata/releases/download/$STRATA_CLI_TAG"
+          mkdir -p "$RUNNER_TEMP/strata-cli" && cd "$RUNNER_TEMP/strata-cli"
+          curl -fsSL -o strata-linux-x64 "$base/strata-linux-x64"
+          curl -fsSL -o SHA256SUMS.txt "$base/SHA256SUMS.txt"
+          grep 'strata-linux-x64$' SHA256SUMS.txt | sed 's/ \*/  /' | sha256sum --check -
+          mv strata-linux-x64 strata && chmod +x strata
+          echo "$RUNNER_TEMP/strata-cli" >> "$GITHUB_PATH"
+          ./strata --version
+
+      - name: Run the demos
+        run: |
+          set -uo pipefail
+          failed=()
+          run() {
+            local pkg
+            pkg=$(sed -n 's/^name *= *"\(.*\)"/\1/p' "demos/$1/Cargo.toml" | head -1)
+            echo "::group::$*"
+            cargo run --quiet --package "$pkg" -- "${@:2}"
+            local code=$?
+            echo "::endgroup::"
+            [ "$code" -eq 0 ] || { echo "::error::$* exited with $code"; failed+=("$*"); }
+          }
+          for dir in demos/[0-9][0-9]-*/; do
+            demo=$(basename "$dir")
+            case "$demo" in
+              03-*|06-*) continue ;;                          # live model: live-model-demos.yml
+              09-*) run "$demo" freeze; run "$demo" resume ;; # the same-runtime hand-off
+              14-*) command -v strata > /dev/null && run "$demo" ;;
+              *) run "$demo" ;;
+            esac
+          done
+          if [ ${#failed[@]} -gt 0 ]; then
+            printf 'Failed: %s\n' "${failed[@]}"
+            exit 1
+          fi

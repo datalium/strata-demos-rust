@@ -1,0 +1,30 @@
+name: A demo doesn't build or run
+description: A demo fails, prints something different from its README, or its README is wrong.
+labels: [bug]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              For a bug in Strata itself (not in a demo), please open it in [datalium/strata](https://github.com/datalium/strata/issues/new/choose).
+    - type: input
+      id: demo
+      attributes:
+          label: Which demo?
+          placeholder: e.g. 05-hitl-interruption
+      validations:
+          required: true
+    - type: textarea
+      id: what
+      attributes:
+          label: What happened?
+          description: The command you ran, what you expected, and what you got. Paste the output.
+          render: text
+      validations:
+          required: true
+    - type: input
+      id: env
+      attributes:
+          label: Environment
+          description: Your OS, and the Rust version (`rustc --version`).
+      validations:
+          required: true
