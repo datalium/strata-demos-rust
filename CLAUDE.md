@@ -11,7 +11,7 @@ prerequisites and wiring, and [demos/README.md](demos/README.md) for the
 current list.
 
 This repo builds against the published Strata crates on crates.io, pinned to
-`=0.9.0-preview.1` in `[workspace.dependencies]` (root `Cargo.toml`). No
+`=0.9.0-preview.2` in `[workspace.dependencies]` (root `Cargo.toml`). No
 checkout of the framework is needed. The `strata` CLI (demo 14) is not on
 crates.io: it is a binary on the `datalium/strata` GitHub Release.
 
@@ -23,7 +23,7 @@ crates.io: it is a binary on the `datalium/strata` GitHub Release.
   error-handling shape can differ or have moved on. Read the source of the
   crate version this repo pins directly (Cargo's registry copy under
   `~/.cargo/registry/src/`, or `rust/strata-core/src`, `strata-memory`,
-  `strata-macros` in `datalium/strata` at tag `v0.9.0-preview.1`), and prefer
+  `strata-macros` in `datalium/strata` at tag `v0.9.0-preview.2`), and prefer
   an existing working example (`examples/rust-agent` in `datalium/strata`)
   over inferring from prose.
 - **Every demo must actually build and run before it's considered done.**

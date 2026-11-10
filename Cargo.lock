@@ -313,9 +313,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata"
-version = "0.9.0-preview.1"
+version = "0.9.0-preview.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36c7b1d5ea617f62f59f359624a764ea37051244f715ac6d72bcff9f7ca3720b"
+checksum = "446c975622f8973daaa9da4e981dfe44f6776ae5a3d2e676da5876c4c4be06eb"
 dependencies = [
  "base64",
  "chrono",
@@ -332,9 +332,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-ai"
-version = "0.9.0-preview.1"
+version = "0.9.0-preview.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e4a9d5f2cd6e325d29954c2c10c6db12d7fdedf825b40efbc2c0c9e7ccad1d1"
+checksum = "abcd1ddb13a13ec838aa16d778653d24ed63520b326c0c709aa583901dff2185"
 dependencies = [
  "chrono",
  "datalium-strata",
@@ -348,9 +348,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-host"
-version = "0.9.0-preview.1"
+version = "0.9.0-preview.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e6178aad7a34bb98e0a3183be8bc1d0f03ad790e5f478710b9a578910d145e3"
+checksum = "c46ef26d1e67d02db413b34e715e39621829539f96e71973bad3f7352ee21ff7"
 dependencies = [
  "chrono",
  "datalium-strata",
@@ -363,9 +363,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-macros"
-version = "0.9.0-preview.1"
+version = "0.9.0-preview.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4352b3cf5bfb906409d625c212f4a1e70304783ded8ef17d6b4a5bd545062118"
+checksum = "aed6d54f100182ab4d9ffb0f30ffee1f621fb8b0e77f6d9dbf38a784b902de72"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -374,9 +374,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-memory"
-version = "0.9.0-preview.1"
+version = "0.9.0-preview.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0517beed2b37c5702d9a2d55066c419471f628fc899ef8929486cd61820a7105"
+checksum = "24b60c55699b9d471e3ff1df74874aedae24c4eaacb1744ada498432ec8d4b47"
 dependencies = [
  "chrono",
  "datalium-strata",

@@ -73,7 +73,7 @@ const GRAPHS: [(&str, Build); 7] = [
 ];
 
 /// Where the `strata` binary for each platform is published.
-const CLI_RELEASE: &str = "https://github.com/datalium/strata/releases/tag/v0.9.0-preview.1";
+const CLI_RELEASE: &str = "https://github.com/datalium/strata/releases/tag/v0.9.0-preview.2";
 
 /// The broken versions' diagnostics: one STRATA-SPEC-004 rule each.
 const BROKEN: [(&str, &str); 3] = [
