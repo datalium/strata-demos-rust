@@ -1,12 +1,12 @@
 # Datalium Strata Demos - Rust
 
-Rust demo suite for Datalium Strata — runnable agentic AI examples from minimal to real-world, built against Strata **0.9** (`0.9.0-preview.1`). It is the twin of [`strata-demos-dotnet`](https://github.com/datalium/strata-demos-dotnet): one demo each in both languages, same number, same story.
+Rust demo suite for Datalium Strata — runnable agentic AI examples from minimal to real-world, built against Strata **0.9** (`0.9.0-preview.2`). It is the twin of [`strata-demos-dotnet`](https://github.com/datalium/strata-demos-dotnet): one demo each in both languages, same number, same story.
 
 ## Prerequisites
 
 - Rust (edition 2024 — a recent stable toolchain via [rustup](https://rustup.rs))
-- Nothing else from Strata to build: Cargo fetches the `datalium-strata*` crates (`0.9.0-preview.1`) from [crates.io](https://crates.io/crates/datalium-strata)
-- The `strata` CLI (optional) — only for [demo 14](demos/14-graph-ci-gate) and for inspecting demo 09's checkpoint file. It is not on crates.io: download `strata-linux-x64`, `strata-macos-x64` or `strata-windows-x64.exe` from the [`v0.9.0-preview.1` release](https://github.com/datalium/strata/releases/tag/v0.9.0-preview.1) (check it against `SHA256SUMS.txt`), rename it to `strata` (`strata.exe` on Windows), and put it on your `PATH`, or set `STRATA_BIN` to its path
+- Nothing else from Strata to build: Cargo fetches the `datalium-strata*` crates (`0.9.0-preview.2`) from [crates.io](https://crates.io/crates/datalium-strata)
+- The `strata` CLI (optional) — only for [demo 14](demos/14-graph-ci-gate) and for inspecting demo 09's checkpoint file. It is not on crates.io: download `strata-linux-x64`, `strata-macos-x64` or `strata-windows-x64.exe` from the [`v0.9.0-preview.2` release](https://github.com/datalium/strata/releases/tag/v0.9.0-preview.2) (check it against `SHA256SUMS.txt`), rename it to `strata` (`strata.exe` on Windows), and put it on your `PATH`, or set `STRATA_BIN` to its path
 - [Docker](https://docs.docker.com/get-docker/) (optional) — only [demo 12](demos/12-pluggable-storage) needs it, for a throwaway Postgres and Redis (`docker compose up -d --wait`, see [`docker-compose.yml`](docker-compose.yml)); every other demo runs with no external services
 - The .NET SDK (optional) — only to run the cross-runtime hand-offs of [demo 09](demos/09-cross-language-interop) and [demo 12](demos/12-pluggable-storage), and the export comparison of [demo 14](demos/14-graph-ci-gate), against the .NET twin
 
@@ -45,11 +45,11 @@ The workspace centralizes references to the Strata crates in `[workspace.depende
 
 ```toml
 [workspace.dependencies]
-datalium-strata = "=0.9.0-preview.1"
-datalium-strata-macros = "=0.9.0-preview.1"
-datalium-strata-memory = "=0.9.0-preview.1"
-datalium-strata-ai = "=0.9.0-preview.1"
-datalium-strata-host = "=0.9.0-preview.1"
+datalium-strata = "=0.9.0-preview.2"
+datalium-strata-macros = "=0.9.0-preview.2"
+datalium-strata-memory = "=0.9.0-preview.2"
+datalium-strata-ai = "=0.9.0-preview.2"
+datalium-strata-host = "=0.9.0-preview.2"
 ```
 
 | Crate | Source in [`datalium/strata`](https://github.com/datalium/strata) | What the demos use it for |

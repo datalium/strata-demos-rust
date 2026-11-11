@@ -17,7 +17,7 @@ concurrency:
 
 env:
   # The strata CLI release demo 14 uses. Keep it in step with the crate versions in Cargo.toml.
-  STRATA_CLI_TAG: v0.9.0-preview.1
+  STRATA_CLI_TAG: v0.9.0-preview.2
   CARGO_TERM_COLOR: always
 
 jobs:

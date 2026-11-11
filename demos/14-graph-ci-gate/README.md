@@ -90,7 +90,7 @@ the same seven graphs, scenarios and checks, and byte-identical exports.
 Your repo needs one small program (a test, an example, a `build.rs`, a tool)
 that builds its graphs and writes `graph.to_definition()` as JSON — this demo's
 `export_all` is that program. Then, with the `strata` binary on the runner
-(the binary for its platform from the [`datalium/strata` release](https://github.com/datalium/strata/releases/tag/v0.9.0-preview.1),
+(the binary for its platform from the [`datalium/strata` release](https://github.com/datalium/strata/releases/tag/v0.9.0-preview.2),
 checked against `SHA256SUMS.txt`):
 
 ```yaml
@@ -108,7 +108,7 @@ cargo run -p graph-ci-gate -- --out ./graphs-rust     # also keep the final expo
 The demo runs the `strata` binary on your `PATH`, or the one
 `STRATA_BIN=/path/to/strata` names. The CLI is not on crates.io: download
 `strata-linux-x64`, `strata-macos-x64` or `strata-windows-x64.exe` from the
-[`v0.9.0-preview.1` release](https://github.com/datalium/strata/releases/tag/v0.9.0-preview.1), rename it to `strata`
+[`v0.9.0-preview.2` release](https://github.com/datalium/strata/releases/tag/v0.9.0-preview.2), rename it to `strata`
 (`strata.exe` on Windows; `chmod +x` it elsewhere) and put it on the `PATH`.
 Without one, the demo stops and says where to get it.
 
@@ -125,7 +125,7 @@ last line of scenario 5 quotes the operating system's own error text; blank
 lines inside the indented CLI output are dropped, as in the .NET twin):
 
 ```
-Using the strata CLI: strata 0.9.0-preview.1
+Using the strata CLI: strata 0.9.0-preview.2
 
 == 1. A broken pull request: seven graphs exported, one CLI call ==
 
