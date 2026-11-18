@@ -5,9 +5,9 @@ Builds the same four-node document review pipeline (`Draft` ->
 same nodes; only the edges differ. The **broken** version routes `Review`
 back to `Draft` on a plain `.add_edge(...)` with no condition, and its exit
 edge names `"Archve"`, a typo. `.compile()` returns
-`Err(StrataError::GraphInvalid(ValidationResult))` carrying three
-diagnostics (dangling edge, orphan node, unguarded cycle) before a single
-node runs. The **fixed** version guards the retry edge with a real predicate
+`Err(StrataError::GraphInvalid(ValidationResult))` carrying six
+diagnostics (a dangling edge, an orphan node, an unguarded cycle, and no path
+to an end for each of the loop's three nodes) before a single node runs. The **fixed** version guards the retry edge with a real predicate
 and fixes the typo. It compiles clean, even though the loop contains a branch
 that rejoins on plain edges, and it runs the loop to completion.
 
@@ -23,7 +23,7 @@ with the same graphs, output and checks.
   `Err(StrataError::GraphInvalid(validation))` (its `errors` carries every
   `ValidationError`) — structural errors abort at startup, not at runtime.
   The demo matches on it, prints every error's `code` and `message`, and
-  checks that exactly the three expected errors are present
+  checks that exactly the six expected errors are present
 - **Dangling edge** (`STRATA_ERR_DANGLING_EDGE`): `.add_edge("Review", "Archve")`
   names a node that doesn't exist. `add_edge` doesn't check its arguments;
   `.compile()` reports one error per such edge, with `node` = the edge's
@@ -35,6 +35,11 @@ with the same graphs, output and checks.
 - **Unguarded cycle** (`STRATA_ERR_UNGUARDED_CYCLE`): a plain `.add_edge(...)`
   closing a loop (`Review` -> `Draft`) with nothing bounding how many times
   it can fire
+- **No path to an end** (`STRATA_ERR_NO_TERMINAL`): the typo also takes away
+  the loop's only exit, so every path from `Draft`, `LegalReview` and
+  `Review` loops back. A run ends at a node with no outgoing edge, and none
+  of them can reach one, so each is reported. `Archive` would be that end,
+  but it is already reported as an orphan
 - The rule for loops: a graph is rejected only if its **plain** edges alone
   form a cycle. The fixed graph has two plain paths from `Draft` to `Review`
   (through `LegalReview`, and directly), so it holds two cycles back to
@@ -54,23 +59,23 @@ with the same graphs, output and checks.
 The 0.3 version of this demo had no `LegalReview` branch and no typo, and
 showed only the orphan and the cycle (`Archive` was simply never wired in).
 The dangling-edge check and the plain-cycles-only rule for loops are what
-the 0.9 validator adds to that story.
+the 0.9 validator adds to that story. Before `0.9.0-preview.3` no check
+proved that a run can end, so the broken graph reported three errors, not
+six.
 
 ## What it does *not* cover
 
 - The `strata graph validate` CLI command (STRATA-SPEC-004's other entry
   point): see [`14-graph-ci-gate`](../14-graph-ci-gate), which runs it over
   a folder of exported graphs
-- A loop whose guard never turns false: the validator accepts it, because
-  it can't evaluate the predicate.
+- A loop whose guard never turns false: the validator accepts it as long
+  as the loop has a way out, because it can't evaluate the predicate.
   `.compile_with(CompileOptions::default().with_max_node_hops(..))` stops
   such a thread at run time; see
   [`16-loop-circuit-breaker`](../16-loop-circuit-breaker)
 - The validator's checks for parallel groups and maps (an empty group, a
   duplicate branch, an unreachable quorum, a wait or boundary inside a map):
   see [`17-parallel-joins`](../17-parallel-joins) and [`18-map-fan-out`](../18-map-fan-out)
-- The spec's "missing terminal path" check is not built: a graph with no
-  exit passes if it has no orphan and no unguarded cycle
 - Tool-calling, streaming, interruption: see
   [`02-tool-calling`](../02-tool-calling) and the demos after this one
 
@@ -87,6 +92,9 @@ Compilation rejected, as STRATA-SPEC-004 requires:
   [STRATA_ERR_DANGLING_EDGE] Edge 'Review' -> 'Archve' points at 'Archve', which is not a node in the graph.
   [STRATA_ERR_ORPHAN] Node 'Archive' is isolated and unreachable from the entry point 'Draft'.
   [STRATA_ERR_UNGUARDED_CYCLE] Unguarded cycle detected between 'Review' and 'Draft'. Add a guarded/conditional edge to protect this loop.
+  [STRATA_ERR_NO_TERMINAL] Node 'Draft' has no path to an end: every path from it loops back without reaching a node with no outgoing edge.
+  [STRATA_ERR_NO_TERMINAL] Node 'LegalReview' has no path to an end: every path from it loops back without reaching a node with no outgoing edge.
+  [STRATA_ERR_NO_TERMINAL] Node 'Review' has no path to an end: every path from it loops back without reaching a node with no outgoing edge.
 
 Same nodes, fixed: guarded the retry edge and fixed the typo -- compiles clean.
 path: Draft -> LegalReview -> Review -> Draft -> Review -> Draft -> Review -> Archive
@@ -95,7 +103,8 @@ path: Draft -> LegalReview -> Review -> Draft -> Review -> Draft -> Review -> Ar
 
 (The order of the errors is fixed by the validator, not by declaration
 order: for each graph level `validate()` reports the entry point, then
-dangling edges, then orphans, then unguarded cycles.)
+dangling edges, then orphans, then unguarded cycles, then nodes with no path
+to an end.)
 
 ## Files
 
