@@ -323,9 +323,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata"
-version = "0.9.0-preview.3"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73f7ba9740acf5af52060764117ff0cecdcb45f619015e609bea289606b5ebc6"
+checksum = "15efdc70a22c83220f4448b7a3f8842df0560d2a018553c19407c9c56bb59576"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -343,9 +343,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-ai"
-version = "0.9.0-preview.3"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b764041bddcb3922219779c59b4c05a97028f47c8bacbbaaf03f4de0517431df"
+checksum = "37ad15cd5746eb108b58490903069ea3a8883f49824916b1d72091246128a97a"
 dependencies = [
  "chrono",
  "datalium-strata",
@@ -359,9 +359,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-host"
-version = "0.9.0-preview.3"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "583f0a7bcc23b59f68290d18f859d3f30076c4fcbfd97924b92ed1a8627ee245"
+checksum = "050f9ff36248f0ffe7fbeba78a8701f02288d763493e1a65562fae8b5d3f1c8b"
 dependencies = [
  "chrono",
  "datalium-strata",
@@ -374,9 +374,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-macros"
-version = "0.9.0-preview.3"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7422adcaaf2f5c00cbf2f37919e6164a5f5d4181303cf5d8911967f65da7df12"
+checksum = "1f967db2397ab2cd36bc0a4bd7efba04ffed63310428df3ccd398a8ac520eb8e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -385,9 +385,9 @@ dependencies = [
 
 [[package]]
 name = "datalium-strata-memory"
-version = "0.9.0-preview.3"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd1ea113193d5790514a64726789dd7aa022e9ef7cb8769b060971b5b587f931"
+checksum = "2b4d444cbfa393209a86f8296ab1abe45f3397b49b167a8561ea39e8a5757032"
 dependencies = [
  "chrono",
  "datalium-strata",
