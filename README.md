@@ -50,6 +50,7 @@ datalium-strata-macros = "=0.9.0"
 datalium-strata-memory = "=0.9.0"
 datalium-strata-ai = "=0.9.0"
 datalium-strata-host = "=0.9.0"
+datalium-strata-mcp = "=0.9.0"
 ```
 
 | Crate | Source in [`datalium/strata`](https://github.com/datalium/strata) | What the demos use it for |
@@ -59,6 +60,7 @@ datalium-strata-host = "=0.9.0"
 | `datalium-strata-memory` | `rust/strata-memory` | Checkpoint and history stores: in-memory, SQLite, Postgres, Redis |
 | `datalium-strata-ai` | `rust/strata-ai` | Model calls, model routes, agents and embeddings (demos 03, 06, 23, 24, 25) |
 | `datalium-strata-host` | `rust/strata-host` | Settings, drivers and a store health probe (demo 28) |
+| `datalium-strata-mcp` | `rust/strata-mcp` | Strata's own MCP client: an MCP server's tools as Strata tools (demo 30). New in `1.0.0-rc.1` |
 
 Individual demo crates reference these with `workspace = true` rather than repeating the relative path:
 
