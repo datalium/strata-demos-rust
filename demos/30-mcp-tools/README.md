@@ -72,11 +72,10 @@ checks. Where the two engines differ, this README says so.
   gives `{"result": {...}}`. A Rust `#[strata_tool]` returns a
   `Result<String, StrataError>`, and the `String` is the result as it is. Here
   it is the `Quote` struct serialized by serde: `{"sku":"A-100","quantity":1,"total":2.5}`
-- **JSON key order.** The server writes `{"sku", "name", "on_hand"}`. The
-  Rust client reads `structuredContent` into a `serde_json::Value`, which keeps
-  an object's keys sorted, so the registry returns
-  `{"name":"Widget","on_hand":12,"sku":"A-100"}`. .NET keeps the server's
-  order. The values are the same
+- **JSON key order.** The Rust client reads `structuredContent` into a
+  `serde_json::Value`, which keeps an object's keys sorted, and .NET keeps the
+  server's order. Both servers write the keys sorted, so both demos print
+  `{"name":"Widget","on_hand":12,"sku":"A-100"}`
 - **Tool names are interned in Rust.** `StrataTool::name()` is a
   `&'static str`, so `datalium-strata-mcp` keeps each distinct name it learns
   from a server (`warehouse.reserve`) for the life of the process. It does
