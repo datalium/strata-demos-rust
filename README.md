@@ -1,6 +1,6 @@
 # Datalium Strata Demos - Rust
 
-Rust demo suite for Datalium Strata — runnable agentic AI examples from minimal to real-world, built against Strata **0.9** (`0.9.0`). It is the twin of [`strata-demos-dotnet`](https://github.com/datalium/strata-demos-dotnet): one demo each in both languages, same number, same story.
+Rust demo suite for Datalium Strata — runnable agentic AI examples from minimal to real-world, built against Strata **0.9** (`0.9.0`). It is the twin of [`strata-demos-dotnet`](https://github.com/datalium/strata-demos-dotnet): one demo each in both languages, same number, same story. Demos `01`–`29` run on 0.9; [demo 30](demos/30-mcp-tools) uses an MCP server's tools through `datalium-strata-mcp`, new in `1.0.0-rc.1`.
 
 ## Prerequisites
 
@@ -50,6 +50,7 @@ datalium-strata-macros = "=0.9.0"
 datalium-strata-memory = "=0.9.0"
 datalium-strata-ai = "=0.9.0"
 datalium-strata-host = "=0.9.0"
+datalium-strata-mcp = "=0.9.0"
 ```
 
 | Crate | Source in [`datalium/strata`](https://github.com/datalium/strata) | What the demos use it for |
@@ -59,6 +60,7 @@ datalium-strata-host = "=0.9.0"
 | `datalium-strata-memory` | `rust/strata-memory` | Checkpoint and history stores: in-memory, SQLite, Postgres, Redis |
 | `datalium-strata-ai` | `rust/strata-ai` | Model calls, model routes, agents and embeddings (demos 03, 06, 23, 24, 25) |
 | `datalium-strata-host` | `rust/strata-host` | Settings, drivers and a store health probe (demo 28) |
+| `datalium-strata-mcp` | `rust/strata-mcp` | Strata's own MCP client: an MCP server's tools as Strata tools (demo 30). New in `1.0.0-rc.1` |
 
 Individual demo crates reference these with `workspace = true` rather than repeating the relative path:
 
@@ -89,4 +91,4 @@ cargo test --workspace
 ## Related
 
 - [datalium/strata](https://github.com/datalium/strata) — the framework (design docs, the Rust crates, the .NET packages, the `strata` CLI); documentation at [stratamesh.dev](https://stratamesh.dev)
-- [strata-demos-dotnet](https://github.com/datalium/strata-demos-dotnet) — the .NET twin of this repo
+- [strata-demos-dotnet](https://github.com/datalium/strata-demos-dotnet) — the .NET twin of this repo: demos `01`–`30`, same numbers and stories
