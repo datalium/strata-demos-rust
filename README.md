@@ -1,6 +1,6 @@
 # Datalium Strata Demos - Rust
 
-Rust demo suite for Datalium Strata — runnable agentic AI examples from minimal to real-world, built against Strata **0.9** (`0.9.0`). It is the twin of [`strata-demos-dotnet`](https://github.com/datalium/strata-demos-dotnet): one demo each in both languages, same number, same story.
+Rust demo suite for Datalium Strata — runnable agentic AI examples from minimal to real-world, built against Strata **0.9** (`0.9.0`). It is the twin of [`strata-demos-dotnet`](https://github.com/datalium/strata-demos-dotnet): one demo each in both languages, same number, same story. Demos `01`–`29` run on 0.9; [demo 30](demos/30-mcp-tools) uses an MCP server's tools through `datalium-strata-mcp`, new in `1.0.0-rc.1`.
 
 ## Prerequisites
 
@@ -91,4 +91,4 @@ cargo test --workspace
 ## Related
 
 - [datalium/strata](https://github.com/datalium/strata) — the framework (design docs, the Rust crates, the .NET packages, the `strata` CLI); documentation at [stratamesh.dev](https://stratamesh.dev)
-- [strata-demos-dotnet](https://github.com/datalium/strata-demos-dotnet) — the .NET twin of this repo
+- [strata-demos-dotnet](https://github.com/datalium/strata-demos-dotnet) — the .NET twin of this repo: demos `01`–`30`, same numbers and stories

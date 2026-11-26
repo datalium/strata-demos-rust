@@ -13,7 +13,14 @@ current list.
 This repo builds against the published Strata crates on crates.io, pinned to
 `=0.9.0` in `[workspace.dependencies]` (root `Cargo.toml`). No
 checkout of the framework is needed. The `strata` CLI (demo 14) is not on
-crates.io: it is a binary on the `datalium/strata` GitHub Release.
+crates.io: it is a binary on the `datalium/strata` GitHub Release. Demo 30
+uses `datalium-strata-mcp`, which is new in `1.0.0-rc.1`: until that is on
+crates.io, it builds only against a local clone (its README says how).
+
+The .NET twin is the sibling repo `strata-demos-dotnet` (demos 01–30, same
+numbers and stories). Demos 09 and 12 hand a thread to it, and demo 14's
+exported files are byte-identical with its, so don't change what crosses the
+wire there without changing the twin too.
 
 ## Conventions to follow
 

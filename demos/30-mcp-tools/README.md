@@ -19,8 +19,8 @@ fixed list of tool calls, the way a model's tool-call loop would.
 
 The .NET twin is
 [`strata-demos-dotnet/demos/30-mcp-tools`](https://github.com/datalium/strata-demos-dotnet/tree/main/demos/30-mcp-tools).
-It has the same five steps, the same server, the same data and the same
-output. Where the two engines differ, this README says so.
+It has the same five sections, the same server, the same data and the same
+checks. Where the two engines differ, this README says so.
 
 ## What it demonstrates
 
@@ -30,37 +30,53 @@ output. Where the two engines differ, this README says so.
   (`tools()`). The server says who it is (`server_info()`). A legacy server,
   one that wants the `initialize` handshake, would be found by the same call,
   with no change to the code
+- **Annotations are hints.** The server marks `lookup_stock` `readOnlyHint`
+  and `delete_sku` `destructiveHint` (`McpTool::annotations`). The demo
+  prints them, and the client decides what to expose: a server says what it
+  likes about its tools
 - **Choosing and naming a server's tools.** `client.tool_set(McpToolOptions::new().include(["lookup_stock", "reserve"]).prefix("warehouse."))`
   takes two of the server's three tools, and `registry.register_mcp(..)`
   registers them next to the local `quote` tool, all or nothing. The
-  destructive `delete_sku` is left out, so nothing can call it through the
-  registry. The prefix keeps a server's names apart from everyone else's. The
-  call still sends the server's own name (`reserve`)
+  destructive `delete_sku` is left out, so a dispatch of
+  `warehouse.delete_sku` is `StrataError::ToolNotFound`: nothing that uses the
+  registry can call it. The prefix keeps a server's names apart from everyone
+  else's, and the call still sends the server's own name (`reserve`)
 - **The server's schema is the manifest.** `warehouse.reserve`'s parameters in
   `registry.manifest()` are the server's `inputSchema`, as a model would see
   them
 - **Middleware sees every call.** One `ToolMiddleware`, added with
   `use_middleware`, prints each call and its result, whether the tool is local
-  or on the server. An MCP tool is a Strata tool: subsets, the
-  `strata.tool` span and the run events apply to it in the same way
+  or on the server. An MCP tool is a Strata tool: subsets, the `strata.tool`
+  span and the run events apply to it in the same way
+- **What a tool returns.** When an MCP tool returns `structuredContent`, that
+  is what the registry returns, as compact JSON, and otherwise the content
+  blocks' text. The local `#[strata_tool]` returns the `String` it builds
 - **A tool's own error is a result.** The server answers the second
-  reservation with `isError` ("only 0 of B-200 on hand"). It reaches the node
-  as the text `{"error":"only 0 of B-200 on hand"}`, the shape a model is
-  given for a refusal, and the node goes on and marks the line backordered. A
-  protocol or transport failure would instead fail the call, as
-  `StrataError::ToolCallFailed`
-- **Structured results.** When a tool returns `structuredContent`, that is
-  what the registry returns, as compact JSON. Otherwise it returns the content
-  blocks' text
+  reservation with `isError` ("only 0 of B-200 on hand"), text only. It
+  reaches the node as `{"error":"only 0 of B-200 on hand"}`, the shape a
+  model is given for a refusal, and the node goes on and marks the line
+  backordered. A protocol or transport failure would instead fail the call,
+  as `StrataError::ToolCallFailed`
 - **Closing.** `client.close().await` closes the server's stdin and waits for
-  it to exit. The server's stderr reaches the client's log hook
-  (`McpClientOptions::with_log`, `McpLogLevel::Debug`, as `stderr: <line>`).
-  The demo prints those lines and checks the last one is
-  `warehouse: stopped`. Dropping the last handle without closing would stop
-  the server's process tree at once
+  it to exit. The server writes how many tool calls it served to its stderr.
+  The client reports each stderr line to its log hook
+  (`McpClientOptions::with_log`) at `McpLogLevel::Debug`, as
+  `stderr: <line>`. That line can reach the log just after `close()` returns,
+  so the demo waits for it (up to 2 s). Four calls reached the server;
+  `warehouse.delete_sku` never did. Dropping the last handle without closing
+  would stop the server's process tree at once
 
 *Engines differ:*
 
+- **A local tool's result.** A .NET `[StrataTool]` that returns an object
+  gives `{"result": {...}}`. A Rust `#[strata_tool]` returns a
+  `Result<String, StrataError>`, and the `String` is the result as it is. Here
+  it is the `Quote` struct serialized by serde: `{"sku":"A-100","quantity":1,"total":2.5}`
+- **JSON key order.** The server writes `{"sku", "name", "on_hand"}`. The
+  Rust client reads `structuredContent` into a `serde_json::Value`, which keeps
+  an object's keys sorted, so the registry returns
+  `{"name":"Widget","on_hand":12,"sku":"A-100"}`. .NET keeps the server's
+  order. The values are the same
 - **Tool names are interned in Rust.** `StrataTool::name()` is a
   `&'static str`, so `datalium-strata-mcp` keeps each distinct name it learns
   from a server (`warehouse.reserve`) for the life of the process. It does
@@ -69,11 +85,7 @@ output. Where the two engines differ, this README says so.
 - **The client's API.** Rust registers a server's tools with
   `tool_set(..)` + `register_mcp(..)` (`McpRegistryExt`), and closes with
   `close().await`. .NET registers `client.ToolProvider(..)` with
-  `ToolRegistry.Register` and closes with `await using`
-- **JSON key order.** Rust's `serde_json` sorts an object's keys, and .NET
-  keeps the server's order. So the server writes its structured results with
-  the keys already in alphabetical order, and the local `quote` tool's result
-  matches. That keeps the output the same in both engines
+  `ToolRegistry.Register` and closes by disposing the client
 
 ## What it does *not* cover
 
@@ -121,46 +133,51 @@ cargo run -p mcp-tools \
 
 That changes `Cargo.lock`. Don't commit it.
 
-Output of a real run, against `datalium/strata` `main` @ `253c104` (still
-version `0.9.0`, with the MCP client of #66):
+The demo checks every claim (the protocol version, the tools, the registry's
+names, the left-out tool, the audit log, the final state and the server's
+last line) and exits non-zero if one fails. Output of a real run, against
+`datalium/strata` `main` @ `253c104` (still version `0.9.0`, with the MCP
+client of #66):
 
 ```
-=== Step 1: connect to an MCP server over stdio ===
-  Started this program again as an MCP server (--mcp-server), over stdio.
+=== 1. Connect: the demo starts itself as an MCP server, over stdio ===
   Protocol version: 2026-07-28
-  Server: warehouse 1.0.0
-  Tools on the server:
-    lookup_stock  Stock on hand for a SKU.
-    reserve       Reserves units of a SKU, taking them out of stock.
-    delete_sku    Deletes a SKU and its stock. Destructive.
+  Server:           warehouse 1.0.0
+  The server's tools:
+    lookup_stock  Units on hand for a SKU. (readOnlyHint)
+    reserve       Reserves units of a SKU for an order.
+    delete_sku    Deletes a SKU and its stock. (destructiveHint)
 
-=== Step 2: MCP tools and a local #[strata_tool] in one registry ===
+=== 2. One registry: a local #[strata_tool] and the server's tools, side by side ===
   Registered: quote, warehouse.lookup_stock, warehouse.reserve
-  delete_sku isn't there: include(..) left it out, so no model can call it.
-  warehouse.reserve takes (sku, quantity), from the server's inputSchema.
+  warehouse.reserve takes (sku, quantity), from the server's input schema.
+  warehouse.delete_sku: no such tool. Include left it out, so nothing that uses this registry can call it.
 
-=== Step 3: one middleware around every call, MCP or local ===
-  audit → warehouse.lookup_stock {"sku":"B-200"}
-  audit ← {"name":"Gadget","on_hand":0,"sku":"B-200"}
-  audit → quote {"sku":"A-100","quantity":1}
-  audit ← {"quantity":1,"sku":"A-100","total":2.5}
+=== 3. Middleware: one audit log around every call, local or MCP ===
+    → quote {"sku":"A-100","quantity":1}
+    ← {"sku":"A-100","quantity":1,"total":2.5}
+    → warehouse.lookup_stock {"sku":"A-100"}
+    ← {"name":"Widget","on_hand":12,"sku":"A-100"}
+  A #[strata_tool] returns the String it builds. An MCP tool returns its structured content, as compact JSON.
 
-=== Step 4: a node calls the tools, as a model's tool loop would ===
-  audit → warehouse.lookup_stock {"sku":"A-100"}
-  audit ← {"name":"Widget","on_hand":12,"sku":"A-100"}
-  audit → quote {"sku":"A-100","quantity":3}
-  audit ← {"quantity":3,"sku":"A-100","total":7.5}
-  audit → warehouse.reserve {"sku":"A-100","quantity":3}
-  audit ← {"left":9,"reserved":3,"sku":"A-100"}
-  audit → warehouse.reserve {"sku":"B-200","quantity":1}
-  audit ← {"error":"only 0 of B-200 on hand"}
-  B-200: the server said "only 0 of B-200 on hand", so it is backordered.
-  Final state: {"reserved":[{"sku":"A-100","quantity":3}],"backordered":["B-200"],"total":7.5}
+=== 4. A graph: a node calls the tools, as a model's tool loop would ===
+    → warehouse.lookup_stock {"sku":"A-100"}
+    ← {"name":"Widget","on_hand":12,"sku":"A-100"}
+    → quote {"sku":"A-100","quantity":3}
+    ← {"sku":"A-100","quantity":3,"total":7.5}
+    → warehouse.reserve {"sku":"A-100","quantity":3}
+    ← {"left":9,"reserved":3,"sku":"A-100"}
+    → warehouse.reserve {"sku":"B-200","quantity":1}
+    ← {"error":"only 0 of B-200 on hand"}
+  Final state of order-1001:
+    reserved:    3 x A-100 (9 left)
+    backordered: 1 x B-200 (only 0 of B-200 on hand)
 
-=== Step 5: close the connection ===
-  close().await closed the server's stdin and waited for it to exit. Its stderr, through with_log:
-    warehouse: serving on stdio
-    warehouse: stopped
+=== 5. Close: the client stops the server ===
+  close().await closed the server's stdin. The server's last words, on its stderr,
+  which the client reads and reports to its log:
+    warehouse: stopped after 4 tool calls
+  Four calls reached the server: warehouse.delete_sku never did.
 
-=== Done: an MCP server's tools, chosen, prefixed and audited like any Strata tool. ===
+=== Done: an MCP server's tools, registered, filtered, wrapped in middleware and called from a graph. ===
 ```
